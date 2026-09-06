@@ -1,76 +1,27 @@
-<!DOCTYPE html>
-
-<head>
-	<title>24 Game</title>
-	<meta charset="utf-8">
-	<meta name="description" content="HTML5-App: 24 Game">
-	<meta name="author" content="Henk Reuling">
-	<meta name="keywords" content="app, mathematics, calculation, order of operations">
-<style>
-	
-body {
-
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  padding: 16px;
-}
-	
-	
-	
-ol li {
-    list-style-type: none;
-    counter-increment: list;
-    position: relative;
-}
-
-ol li:after {
-    content: counter(list) ".";
-    position: absolute;
-    left: -2.5em;
-    width: 2em;
-    text-align: right;
-    color: grey;
-}
-</style>
-
-</head>
-
-<body>
-
-<h1 id="koptekst">24 Game</h1>
-
-<input type="number" value="5" id="num_to_generate">
-<button onclick="gen();">Generate</button>
-<div id="puzzels"></div>
-
-
-<script>
-
 function printSolution(res) {
-  let d = document.createElement('details');
-  d.style = "font-family: Sans Serif; line-height: 2em;";
-  let s = document.createElement('summary')
+  let d = document.createElement("details");
+  let s = document.createElement("summary");
   s.innerHTML = `[ ${res.getallen[0]} ${res.getallen[1]} ${res.getallen[2]} ${res.getallen[3]} ]`;
-  let ol = document.createElement('ol');
-  for (sol of res.oplossingen) {
-    let li = document.createElement('li');
-    sol = sol.replace(/\*/g,times);
-    sol = sol.replace(/\//,':');
-    sol = sol.replace(/-/,eraf);
-    li.innerHTML = sol;
-    ol.appendChild(li);
-  }
   d.appendChild(s);
+  let ol = document.createElement("ol");
+  for (sol of res.oplossingen) {
+    if (sol) {
+      let li = document.createElement("li");
+      sol = sol.replaceAll(/\*/g, times);
+      sol = sol.replaceAll(/\//g, ":");
+      sol = sol.replaceAll(/-/g, eraf);
+      li.innerHTML = `\(${sol}\)`;
+      ol.appendChild(li);
+    }
+  }
   d.appendChild(ol);
   return d;
 }
 
-function gen(){
-  let n = Number(document.getElementById('num_to_generate').value);
-  let tgt = document.getElementById('puzzels');
+function gen() {
+  let n = Number(document.getElementById("num_to_generate").value);
+  let tgt = document.getElementById("puzzels");
   for (let i = 0; i < n; i++) {
-
     let res = generate();
     let e = printSolution(res);
     tgt.appendChild(e);
@@ -78,19 +29,38 @@ function gen(){
   }
 }
 
-var volgordes =
-    	 ["0123", "0132", "0213", "0231", "0312", "0321",
-    		"1023", "1032", "1203", "1230", "1302", "1320",
-    		"2013", "2031", "2103", "2130", "2301", "2310",
-    		"3012", "3021", "3102", "3120", "3201", "3210"];
-    		// Truc om de 24 volgordes om de 4 getallen over de 4 plaatsen te verdelen -->
-    		// op een handige manier langs te lopen; het zijn de 24 'masks'.
+var volgordes = [
+  "0123",
+  "0132",
+  "0213",
+  "0231",
+  "0312",
+  "0321",
+  "1023",
+  "1032",
+  "1203",
+  "1230",
+  "1302",
+  "1320",
+  "2013",
+  "2031",
+  "2103",
+  "2130",
+  "2301",
+  "2310",
+  "3012",
+  "3021",
+  "3102",
+  "3120",
+  "3201",
+  "3210",
+];
+// Truc om de 24 volgordes om de 4 getallen over de 4 plaatsen te verdelen -->
+// op een handige manier langs te lopen; het zijn de 24 'masks'.
 var times = "\u00D7";
 var eraf = "\u2212";
 var operatie = ["+", "-", "*", "/", "(", ")"];
 var operatie2 = ["+", eraf, times, ":", "(", ")"];
-var aantalGoed = 0;
-var aantalOpgegeven = 0;
 var getallen = new Array(4);
 var gebruikt = new Array(4);
 var oplossingen = new Array();
@@ -99,387 +69,149 @@ var gemaakteOpgaven = new Array();
 
 var aantal_oplossingen = 0;
 var numclicks;
-var invoer = new Array();
-var startbutton = document.getElementById('startButton');
-var surrenderbutton = document.getElementById('surrenderButton');
-var scoretekst = document.getElementById('scoreText');
-var invoerregel = document.getElementById("berekening");
-var breedte = 360;
-var hoogte = 360;
-var hulp;
-var gestart = false;
-var vorigeKnop;
-var voorbeeldOplossing = '';
-
-function start(){
-	startbutton.style.display = "block";
-	surrenderbutton.style.display = "none";
-	druk_flippo(24,'','','','');
-}
+var voorbeeldOplossing = "";
 
 function generate() {
-	var solutions = 0;
-	var hulp="";
-	var hulp2= new Array(4);
-	numclicks = 0;
-	do {
-			for (var i=0; i<4; i++) getallen[i]= 1+Math.floor(Math.random()*9);
-			getallen.sort(); //getallen sorteren van klein naar groot, om te kunnen checken of het al eens gebruikt is
-			solutions = calculate();
-		 }
-	while (solutions<=(50*0.85**aantalOpgaven)
-		|| gemaakteOpgaven.indexOf(''+getallen[0]+getallen[1]+getallen[2]+getallen[3])>=0
-	  || (aantalOpgaven>3&&getallen[0]+getallen[1]+getallen[2]+getallen[3]==24));
-	//check:
-	// - zijn er voldoende oplossingen, ofwel, is ie eenvoudig genoeg?
-	// - is deze flippo al gemaakt? Dan niet nog een keer
-	// - alleen bij de eerste drie mag de som van de cijfers 24 zijn. Daarna is dat te eenvoudig
+  var solutions = 0;
+  numclicks = 0;
+  do {
+    for (var i = 0; i < 4; i++) {
+      getallen[i] = 1 + Math.floor(Math.random() * 9);
+    }
+    getallen.sort(); //getallen sorteren van klein naar groot, om te kunnen checken of het al eens gebruikt is
+    solutions = calculate();
+    // -> solutions = calculate(getallen).length
+  } while (
+    solutions <= 50 * 0.85 ** aantalOpgaven ||
+    gemaakteOpgaven.indexOf(
+      "" + getallen[0] + getallen[1] + getallen[2] + getallen[3],
+    ) >= 0 ||
+    (aantalOpgaven > 3 &&
+      getallen[0] + getallen[1] + getallen[2] + getallen[3] == 24)
+  );
+  //check:
+  // - zijn er voldoende oplossingen, ofwel, is ie eenvoudig genoeg?
+  // - is deze flippo al gemaakt? Dan niet nog een keer
+  // - alleen bij de eerste drie mag de som van de cijfers 24 zijn. Daarna is dat te eenvoudig
 
-	//gemaakte opgaven opslaan
-	gemaakteOpgaven[aantalOpgaven]=''+getallen[0]+getallen[1]+getallen[2]+getallen[3];
-	aantalOpgaven++;
-	voorbeeldOplossing = oplossingen[0].replace(/\*/g,times);
-	voorbeeldOplossing = voorbeeldOplossing.replace(/\//,':');
-	voorbeeldOplossing = voorbeeldOplossing.replace(/-/,eraf);
+  //gemaakte opgaven opslaan
+  gemaakteOpgaven[aantalOpgaven] =
+    "" + getallen[0] + getallen[1] + getallen[2] + getallen[3];
+  aantalOpgaven++;
 
-	shuffle(getallen); //volgorde weer door elkaar gooien zodat niet telkens het kleinste getal boven staat;
-	for (var i=0; i<4; i++) gebruikt[i] = false;
-	// druk_flippo(24,getallen[0],getallen[1],getallen[2],getallen[3]);
-	vorigeKnop = 0;
-	gestart = true;
-	// console.log(getallen)
-	// console.log(solutions);
-	// console.log(voorbeeldOplossing);
+  shuffle(getallen); //volgorde weer door elkaar gooien zodat niet telkens het kleinste getal boven staat;
+  for (var i = 0; i < 4; i++) {
+    gebruikt[i] = false;
+  }
+  vorigeKnop = 0;
+  gestart = true;
 
-	return { getallen, oplossingen }
+  return { getallen, oplossingen };
 }
 
-function startSpel(){
-	document.getElementById("informatie").style.display="none";
-	document.getElementById("melding_goed").style.display="none";
-	document.getElementById("berekening").style.display="block";
-	var solutions = 0;
-	var hulp="";
-	var hulp2= new Array(4);
-	startbutton.style.display= 'none';
-	surrenderbutton.style.display = 'block';
-	numclicks = 0;
-	invoerregel.innerHTML = "Calculation: ";
-	do {
-			for (var i=0; i<4; i++) getallen[i]= 1+Math.floor(Math.random()*9);
-			getallen.sort(); //getallen sorteren van klein naar groot, om te kunnen checken of het al eens gebruikt is
-			solutions = calculate();
-		 }
-	while (solutions<=(50*0.85**aantalOpgaven)
-		|| gemaakteOpgaven.indexOf(''+getallen[0]+getallen[1]+getallen[2]+getallen[3])>=0
-	  || (aantalOpgaven>3&&getallen[0]+getallen[1]+getallen[2]+getallen[3]==24));
-	//check:
-	// - zijn er voldoende oplossingen, ofwel, is ie eenvoudig genoeg?
-	// - is deze flippo al gemaakt? Dan niet nog een keer
-	// - alleen bij de eerste drie mag de som van de cijfers 24 zijn. Daarna is dat te eenvoudig
-
-	//gemaakte opgaven opslaan
-	gemaakteOpgaven[aantalOpgaven]=''+getallen[0]+getallen[1]+getallen[2]+getallen[3];
-	aantalOpgaven++;
-	voorbeeldOplossing = oplossingen[0].replace(/\*/g,times);
-	voorbeeldOplossing = voorbeeldOplossing.replace(/\//,':');
-	voorbeeldOplossing = voorbeeldOplossing.replace(/-/,eraf);
-
-	shuffle(getallen); //volgorde weer door elkaar gooien zodat niet telkens het kleinste getal boven staat;
-	for (var i=0; i<4; i++) gebruikt[i] = false;
-	// druk_flippo(24,getallen[0],getallen[1],getallen[2],getallen[3]);
-	vorigeKnop = 0;
-	gestart = true;
-}
-
-function buttonClick(knop) {
-	if (gestart)
-	{
-		var laatste="";
-		var klaar="";
-		var invoerregel = document.getElementById("berekening");
-		switch(knop)
-		{
-			case 'a': //a=0,b=1,c=2,d=3
-								if ((!gebruikt[0]) && (vorigeKnop>3 || numclicks == 0)){
-									//direct voor een getal mag niet een getal geklikt zijn
-									document.getElementById("cijferA").style.display="none";
-									gebruikt[0]=true;
-									invoer[numclicks]=0; numclicks++;
-									vorigeKnop = 0;
-							 }
-							 break;
-			case 'b': //a=0,b=1,c=2,d=3
-								if ((!gebruikt[1]) && (vorigeKnop>3 || numclicks == 0)){
-									//direct voor een getal mag niet een getal geklikt zijn
-									document.getElementById("cijferB").style.display="none";
-									gebruikt[1]=true;
-									invoer[numclicks]=1; numclicks++;
-									vorigeKnop = 1;
-								}
-								break;
-			case 'c': //a=0,b=1,c=2,d=3
-								if ((!gebruikt[2]) && (vorigeKnop>3 || numclicks == 0)){
-									//direct voor een getal mag niet een getal geklikt zijn
-									document.getElementById("cijferC").style.display="none";
-									gebruikt[2]=true;
-									invoer[numclicks]=2; numclicks++;
-									vorigeKnop = 2;
-								}
-								break;
-			case 'd': //a=0,b=1,c=2,d=3
-								if ((!gebruikt[3]) && (vorigeKnop>3 || numclicks == 0)){
-									//direct voor een getal mag niet een getal geklikt zijn
-									document.getElementById("cijferD").style.display="none";
-									gebruikt[3]=true;
-									invoer[numclicks]=3; numclicks++;
-									vorigeKnop = 3;
-								}
-								break;
-			case '+':
-								if (!(vorigeKnop>=4 && vorigeKnop<=7) && numclicks>0){
-									//direct voor een operatie mag geen andere operatie geklikt zijn
-									vorigeKnop = 4; invoer[numclicks]=4; numclicks++;
-								}
-								break;   //+
-			case '-':
-								if (!(vorigeKnop>=4 && vorigeKnop<=7) && numclicks>0){
-									//direct voor een operatie mag geen andere operatie geklikt zijn
-									vorigeKnop = 5; invoer[numclicks]=5; numclicks++;
-								}
-								break;   //-
-			case '*':
-								if (!(vorigeKnop>=4 && vorigeKnop<=7) && numclicks>0){
-									//direct voor een operatie mag geen andere operatie geklikt zijn
-									vorigeKnop = 6; invoer[numclicks]=6; numclicks++;
-								}
-								break;   //*
-			case '/':
-								if (!(vorigeKnop>=4 && vorigeKnop<=7) && numclicks>0){
-									//direct voor een operatie mag geen andere operatie geklikt zijn
-									vorigeKnop = 7; invoer[numclicks]=7; numclicks++;
-								}
-								break;   //:
-			case '(':
-								if ((vorigeKnop>3 && vorigeKnop!=9) || numclicks == 0){
-									//direct voor een openhaakje mag geen getal geklikt zijn
-									vorigeKnop = 8; invoer[numclicks]=8; numclicks++;
-								}
-								break;   //(
-			case ')':
-								if (!(vorigeKnop>=4 && vorigeKnop<=8) && numclicks > 0){
-									//direct voor een sluithaakje mag geen operator geklikt zijn
-									vorigeKnop = 9; invoer[numclicks]=9; numclicks++;
-								}
-								break; //)
-			case 'back':
-								if (numclicks>0){
-										numclicks--;
-										laatste = invoer[numclicks];
-										if (laatste<4) {
-											gebruikt[laatste] = false;
-											druk_flippo(24,getallen[0],getallen[1],getallen[2],getallen[3]);
-										}
-										if (numclicks>0)vorigeKnop = invoer[numclicks-1]
-										else vorigeKnop = -1;
-								}
-							 	break; //backspace
-			case '=':
-								if (numclicks>0){
-									try {
-										hulp=eval(naarBerekening(invoer,numclicks));
-										if (hulp == 24) {
-											if (gebruikt[0]==true && gebruikt[1]==true && gebruikt[2]==true && gebruikt[3]==true){
-												document.getElementById('goedtekst1').innerHTML="<font color=\"#E31E24\"><b> Well done!</b></font>"
-												document.getElementById('goedtekst2').innerHTML="The result is indeed 24:";
-												document.getElementById('goedtekst3').innerHTML=naarString(invoer,numclicks)+' = 24';
-												document.getElementById('goedtekst4').innerHTML="&nbsp;";
-												document.getElementById('goedtekst5').innerHTML="There are "+aantal_oplossingen+" solutions";
-												document.getElementById('goedtekst6').innerHTML="Press <b>start</b> to get a new challenge";
-												document.getElementById('melding_goed').style.display='block';
-												aantalGoed++
-												gestart = false;
-												klaar = " = 24 <font color=\"#E31E24\"><b> correct!</b></font>";
-												surrenderbutton.style.display = "none";
-												startbutton.style.display = "block";
-											}
-											else{
-												document.getElementById('fouttekst1').innerHTML="The result is indeed 24:";
-												document.getElementById('fouttekst2').innerHTML=naarString(invoer,numclicks)+' = 24';
-												document.getElementById('fouttekst3').innerHTML="But you didn't use all four numbers";
-												document.getElementById('fouttekst4').innerHTML="So, that is not correct after all";
-												document.getElementById('fouttekst5').innerHTML="&nbsp;";
-												document.getElementById('fouttekst6').innerHTML="Try again";
-												document.getElementById('melding_fout').style.display='block';
-												numclicks = 0;
-											}
-										}
-										else {
-											document.getElementById('fouttekst1').innerHTML="No, that is not right";
-											document.getElementById('fouttekst2').innerHTML="&nbsp;";
-											document.getElementById('fouttekst3').innerHTML="Your input gives:";
-											document.getElementById('fouttekst4').innerHTML=naarString(invoer,numclicks)+' = '+hulp;
-											document.getElementById('fouttekst5').innerHTML="&nbsp;";
-											document.getElementById('fouttekst6').innerHTML="Try again";
-											document.getElementById('melding_fout').style.display='block';
-											numclicks = 0;
-										}
-										for (var i=0; i<4; i++) gebruikt[i]=false;
-										druk_flippo(24,getallen[0],getallen[1],getallen[2],getallen[3]);
-									}
-									catch(e){
-										document.getElementById('fouttekst1').innerHTML="I don't understand...";
-										document.getElementById('fouttekst2').innerHTML="&nbsp;";
-										document.getElementById('fouttekst3').innerHTML="Enter a correct calculation";
-										document.getElementById('fouttekst4').innerHTML="(Did you check the brackets?)";
-										document.getElementById('fouttekst5').innerHTML="&nbsp;";
-										document.getElementById('fouttekst6').innerHTML="Try again";
-										document.getElementById('melding_fout').style.display='block';
-										numclicks=0;
-										for (var i=0; i<4; i++) gebruikt[i]=false;
-										druk_flippo(24,getallen[0],getallen[1],getallen[2],getallen[3]);
-									}
-								}
-								break; //=
-			//default: //
-		}
-		invoerregel.innerHTML = "Calculation: "+naarString(invoer,numclicks)+klaar;
-	}
-}
-
-function druk_flippo(doelgetal,a,b,c,d){
-	if (aantalOpgaven>0) document.getElementById("koptekst").innerHTML="24 Game (puzzle "+aantalOpgaven+")";
-	else document.getElementById("koptekst").innerHTML="24 Game";
-	scoretekst.innerHTML = "Solved: "+aantalGoed+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Not solved: "+aantalOpgegeven;
-	document.getElementById("cijferA").innerHTML=a;
-	document.getElementById("cijferB").innerHTML=b;
-	document.getElementById("cijferC").innerHTML=c;
-	document.getElementById("cijferD").innerHTML=d;
-	if (!gebruikt[0]) document.getElementById("cijferA").style.display='block';
-	if (!gebruikt[1]) document.getElementById("cijferB").style.display='block';
-	if (!gebruikt[2]) document.getElementById("cijferC").style.display='block';
-	if (!gebruikt[3]) document.getElementById("cijferD").style.display='block';
-}
-
-function ikGeefOp(){
-	document.getElementById('fouttekst1').innerHTML="Pity you gave up...<br>";
-	document.getElementById('fouttekst2').innerHTML="There are "+aantal_oplossingen+" different solutions!";
-	document.getElementById('fouttekst3').innerHTML="One of which is:"
-	document.getElementById('fouttekst4').innerHTML=voorbeeldOplossing+" = 24";
-	document.getElementById('fouttekst5').innerHTML="&nbsp;";
-	document.getElementById('fouttekst6').innerHTML="You will get a new challenge";
-	document.getElementById('melding_fout').style.display='block';
-	aantalOpgegeven++;
-	startSpel();
-}
-
-function calculate(){
-//	var solutions = document.getElementById("solutions");
-	aantal_oplossingen = 0;
-	for (var i=0; i<24; i++)
-		{
-			var p = getallen[parseInt(volgordes[i].substring(0,1))];
-			var q = getallen[parseInt(volgordes[i].substring(1,2))];
-			var r = getallen[parseInt(volgordes[i].substring(2,3))];
-			var s = getallen[parseInt(volgordes[i].substring(3,4))];
-			for (var k1=0; k1<4; k1++){
-				for (var k2=0; k2<4; k2++){
-					for (var k3=0; k3<4; k3++){
-							var o1=operatie[k1];
-							var o2=operatie[k2];
-							var o3=operatie[k3];
-							//(((a#b)#c)#d)
-								if (Math.abs(bereken(bereken(bereken(p,q,o1),r,o2),s,o3) - 24) <= 0.01)
-								{
-									oplossingen[aantal_oplossingen] = "(("+p+o1+q+")"+o2+r+")"+o3+s;
-									aantal_oplossingen ++;
-								}
-							//((a#(b#c))#d)
-								if (Math.abs(bereken(bereken(p,bereken(q,r,o2),o1),s,o3) - 24)<=0.01)
-								{
-									oplossingen[aantal_oplossingen] = "("+p+o1+"("+q+o2+r+"))"+o3+s;
-									aantal_oplossingen ++;
-								}
-							//((a#b)#(c#d))
-								if (Math.abs(bereken(bereken(p,q,o1),bereken(r,s,o3),o2) - 24)<=0.01)
-								{
-									oplossingen[aantal_oplossingen] = "("+p+o1+q+")"+o2+"("+r+o3+s+")";
-									aantal_oplossingen ++;
-								}
-							//(a#((b#c)#d))
-								if (Math.abs(bereken(p,bereken(bereken(q,r,o2),s,o3),o1) - 24)<=0.01)
-								{
-									oplossingen[aantal_oplossingen] = p+o1+"(("+q+o2+r+")"+o3+s+")";
-									aantal_oplossingen ++;
-								}
-							//(a#(b#(c#d)))
-								if (Math.abs(bereken(p,bereken(q,bereken(r,s,o3),o2),o1) - 24)<=0.01){
-									oplossingen[aantal_oplossingen] = p+o1+"("+q+o2+"("+r+o3+s+"))";
-									aantal_oplossingen ++;
-								}
-							//dubbele items verwijderen uit de oplossingen-array
-								if (aantal_oplossingen>1){
-									for (var ii=0; ii<aantal_oplossingen; ii++){
-										for (var j=ii+1; j<aantal_oplossingen; j++){
-												if (oplossingen[j] == oplossingen[ii]){
-													for (var k=j; k<aantal_oplossingen; k++){
-														oplossingen[k]=oplossingen[k+1];
-													}
-													aantal_oplossingen--;
-													j--;
-												}
-										}
-									}
-								}
-					}
-				}
-			}
-		};
-	  return aantal_oplossingen;
+// pass [a, b, c, d]
+// use local solutions
+// return []solutions
+function calculate(g) {
+  aantal_oplossingen = 0;
+  for (var i = 0; i < 24; i++) {
+    var p = g[parseInt(volgordes[i].substring(0, 1))];
+    var q = g[parseInt(volgordes[i].substring(1, 2))];
+    var r = g[parseInt(volgordes[i].substring(2, 3))];
+    var s = g[parseInt(volgordes[i].substring(3, 4))];
+    for (var k1 = 0; k1 < 4; k1++) {
+      for (var k2 = 0; k2 < 4; k2++) {
+        for (var k3 = 0; k3 < 4; k3++) {
+          var o1 = operatie[k1];
+          var o2 = operatie[k2];
+          var o3 = operatie[k3];
+          //(((a#b)#c)#d)
+          if (
+            Math.abs(bereken(bereken(bereken(p, q, o1), r, o2), s, o3) - 24) <=
+            0.01
+          ) {
+            oplossingen[aantal_oplossingen] =
+              "((" + p + o1 + q + ")" + o2 + r + ")" + o3 + s;
+            aantal_oplossingen++;
+          }
+          //((a#(b#c))#d)
+          if (
+            Math.abs(bereken(bereken(p, bereken(q, r, o2), o1), s, o3) - 24) <=
+            0.01
+          ) {
+            oplossingen[aantal_oplossingen] =
+              "(" + p + o1 + "(" + q + o2 + r + "))" + o3 + s;
+            aantal_oplossingen++;
+          }
+          //((a#b)#(c#d))
+          if (
+            Math.abs(bereken(bereken(p, q, o1), bereken(r, s, o3), o2) - 24) <=
+            0.01
+          ) {
+            oplossingen[aantal_oplossingen] =
+              "(" + p + o1 + q + ")" + o2 + "(" + r + o3 + s + ")";
+            aantal_oplossingen++;
+          }
+          //(a#((b#c)#d))
+          if (
+            Math.abs(bereken(p, bereken(bereken(q, r, o2), s, o3), o1) - 24) <=
+            0.01
+          ) {
+            oplossingen[aantal_oplossingen] =
+              p + o1 + "((" + q + o2 + r + ")" + o3 + s + ")";
+            aantal_oplossingen++;
+          }
+          //(a#(b#(c#d)))
+          if (
+            Math.abs(bereken(p, bereken(q, bereken(r, s, o3), o2), o1) - 24) <=
+            0.01
+          ) {
+            oplossingen[aantal_oplossingen] =
+              p + o1 + "(" + q + o2 + "(" + r + o3 + s + "))";
+            aantal_oplossingen++;
+          }
+          //dubbele items verwijderen uit de oplossingen-array
+          if (aantal_oplossingen > 1) {
+            for (var ii = 0; ii < aantal_oplossingen; ii++) {
+              for (var j = ii + 1; j < aantal_oplossingen; j++) {
+                if (oplossingen[j] == oplossingen[ii]) {
+                  for (var k = j; k < aantal_oplossingen; k++) {
+                    oplossingen[k] = oplossingen[k + 1];
+                  }
+                  aantal_oplossingen--;
+                  j--;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return aantal_oplossingen;
 }
 
 function bereken(a, b, operatie) {
-		var x=0;
-		if (operatie == "+") x=a+b;
-		if (operatie == "-") x=a-b;
-		if (operatie == "*") x=a*b;
-		if (operatie == "/") x=a/b;
-		return x;
+  var x = 0;
+  if (operatie == "+") x = a + b;
+  if (operatie == "-") x = a - b;
+  if (operatie == "*") x = a * b;
+  if (operatie == "/") x = a / b;
+  return x;
 }
 
-function naarString(klikrij,numkliks){
-	var regel="";
-	for (var i=0; i<numkliks; i++){
-		if (klikrij[i]<4) regel = regel + getallen[klikrij[i]];
-		else regel = regel + operatie2[klikrij[i]-4];// de operaties  +-x:()
-	}
-	return regel
+function shuffle(array) {
+  var m = array.length,
+    t,
+    i;
+  // While there remain elements to shuffle…
+  while (m) {
+    // Pick a remaining element…
+    i = Math.floor(Math.random() * m--);
+    // And swap it with the current element.
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+  return array;
 }
-
-function naarBerekening(klikrij,numkliks){
-	var regel="";
-	for (var i=0; i<numkliks; i++){
-		if (klikrij[i]<4) regel = regel + getallen[klikrij[i]];
-		else regel = regel + operatie[klikrij[i]-4];// de operaties  +-*/()
-	}
-	return regel
-}
-
-function shuffle(array){
-	var m = array.length, t, i;
-	// While there remain elements to shuffle…
-	while (m) {
-		// Pick a remaining element…
-		i = Math.floor(Math.random() * m--);
-		// And swap it with the current element.
-		t = array[m];
-		array[m] = array[i];
-		array[i] = t;
-	}
-	return array;
-}
-
-</script>
-</body>
-
-</html>
