@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<head>
+  <title>24 Game</title>
+  <meta charset="utf-8">
+  <meta name="description" content="HTML5-App: 24 Game">
+  <meta name="author" content="Henk Reuling">
+  <meta name="keywords" content="app, mathematics, calculation, order of operations">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* {
+    box-sizing: content-box;
+    /*border: 1pt solid blue;*/
+    line-height: 1.5em;
+    /*font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;*/
+}
+html {
+    font-size: 12pt;
+}
+.container {
+    width: 100%;
+    height: 100%;
+}
+input {
+    width: 4em;
+}
+ol li {
+    list-style-type: none;
+    counter-increment: list;
+    position: relative;
+}
+
+ol li:after {
+    content: counter(list) ".";
+    position: absolute;
+    left: -2.5em;
+    width: 2em;
+    text-align: right;
+    color: grey;
+}
+</style>
+
+<!--<script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js">
+</script>-->
+
+</head>
+
+<body>
+
+<div class="container">
+    <h1 id="koptekst">24 Game</h1>
+    <h3>Solve</h3>
+    <input type="number" value="8" id="n1">
+    <input type="number" value="8" id="n2">
+    <input type="number" value="3" id="n3">
+    <input type="number" value="3" id="n4">
+    <button onclick="solve();">Solve</button>
+
+    <h3>Generate</h3>
+    <input type="number" value="5" id="num_to_generate">
+    <button onclick="gen();">Generate</button>
+
+    <h3>Puzzles</h3>
+    <div id="puzzels"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+
+</html>
