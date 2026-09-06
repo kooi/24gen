@@ -6,12 +6,65 @@
 	<meta name="description" content="HTML5-App: 24 Game">
 	<meta name="author" content="Henk Reuling">
 	<meta name="keywords" content="app, mathematics, calculation, order of operations">
+<style>ol li {
+    list-style-type: none;
+    counter-increment: list;
+    position: relative;
+}
+
+ol li:after {
+    content: counter(list) ".";
+    position: absolute;
+    left: -2.5em;
+    width: 2em;
+    text-align: right;
+    color: grey;
+}
+</style>
+
 </head>
 
 <body>
 
 <h1 id="koptekst">24 Game</h1>
+
+<input type="number" value="5" id="num_to_generate">
+<button onclick="gen();">Generate</button>
+<div id="puzzels"></div>
+
+
 <script>
+
+function printSolution(res) {
+  let d = document.createElement('details');
+  d.style = "font-family: Sans Serif; line-height: 2em;";
+  let s = document.createElement('summary')
+  s.innerHTML = `[ ${res.getallen[0]} ${res.getallen[1]} ${res.getallen[2]} ${res.getallen[3]} ]`;
+  let ol = document.createElement('ol');
+  for (sol of res.oplossingen) {
+    let li = document.createElement('li');
+    sol = sol.replace(/\*/g,times);
+    sol = sol.replace(/\//,':');
+    sol = sol.replace(/-/,eraf);
+    li.innerHTML = sol;
+    ol.appendChild(li);
+  }
+  d.appendChild(s);
+  d.appendChild(ol);
+  return d;
+}
+
+function gen(){
+  let n = Number(document.getElementById('num_to_generate').value);
+  let tgt = document.getElementById('puzzels');
+  for (let i = 0; i < n; i++) {
+
+    let res = generate();
+    let e = printSolution(res);
+    tgt.appendChild(e);
+    console.log(res);
+  }
+}
 
 var volgordes =
     	 ["0123", "0132", "0213", "0231", "0312", "0321",
@@ -82,9 +135,11 @@ function generate() {
 	// druk_flippo(24,getallen[0],getallen[1],getallen[2],getallen[3]);
 	vorigeKnop = 0;
 	gestart = true;
-	console.log(getallen)
-	console.log(solutions);
-	console.log(voorbeeldOplossing);
+	// console.log(getallen)
+	// console.log(solutions);
+	// console.log(voorbeeldOplossing);
+
+	return { getallen, oplossingen }
 }
 
 function startSpel(){
@@ -411,8 +466,6 @@ function shuffle(array){
 	}
 	return array;
 }
-
-document.addEventListener("DOMContentLoaded",generate,false); //Page loaded: start()
 
 </script>
 </body>
