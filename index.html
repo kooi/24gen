@@ -37,11 +37,6 @@ ol li:after {
     color: grey;
 }
 </style>
-
-<!--<script id="MathJax-script" async
-        src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js">
-</script>-->
-
 </head>
 
 <body>
@@ -135,7 +130,7 @@ function generate() {
       getallen[i] = 1 + Math.floor(Math.random() * 9);
     }
     getallen.sort(); //getallen sorteren van klein naar groot, om te kunnen checken of het al eens gebruikt is
-    solutions = calculate();
+    solutions = calculate(getallen);
     // -> solutions = calculate(getallen).length
   } while (
     solutions <= 50 * 0.85 ** aantalOpgaven ||
